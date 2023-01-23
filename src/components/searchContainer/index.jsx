@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { TbSearch } from "react-icons/tb";
 import { BsXLg } from "react-icons/bs";
 import { FiTrendingUp } from "react-icons/fi";
 import colors from "styles/colors";
-import PropTypes from "prop-types";
+import { SearchContext } from "context/search-context";
+import { MoviesContext } from "context/movies-context";
 import {
   StyledSearchContainer,
   StyledSearchField,
@@ -17,19 +18,22 @@ import {
 
 /**
  * A container that that has the search box that appears upon clicking the search icon in the header.
- *
- * @param {Array} popularMoviesList The array of all movies.
- * @param {bool} searchIsFilled A boolean indicates if the search field is filled with text or not.
- * @param {object} searchFieldRef A ref object for the search field.
- * @param {func} checkInput A function that updates the state (searchIsFilled) according to the search field's content.
  */
-function SearchContainer({
-  popularMoviesList,
-  searchIsFilled,
-  searchFieldRef,
-  checkInput,
-}) {
+function SearchContainer() {
   const [searchResults, setSearchResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { searchFieldRef, searchIsFilled, setSearchIsFilled } =
+    useContext(SearchContext);
+  const { popularMoviesList } = useContext(MoviesContext);
+
+  /**
+   * A function that updates the state (searchIsFilled) according to the search field's content.
+   */
+  const checkInput = () => {
+    searchFieldRef.current.value !== ""
+      ? setSearchIsFilled(true)
+      : setSearchIsFilled(false);
+  };
 
   /**
    * A function that filters the movies list and updates the (searchResults) accordingly.
@@ -55,10 +59,13 @@ function SearchContainer({
             ref={searchFieldRef}
             type="text"
             placeholder="search for a movie, tv show, person,..."
-            onChange={() => {
+            onChange={(e) => {
               checkInput();
               filterMoviesSearch();
+              setSearchTerm(e.target.value)
             }}
+            inputProps={{ "data-testid": "content-input" }}
+            value={searchTerm}
           />
           <BsXLg
             size={18}
@@ -117,12 +124,5 @@ function SearchContainer({
     </StyledSearchContainer>
   );
 }
-
-SearchContainer.propTypes = {
-  popularMoviesList: PropTypes.array.isRequired,
-  searchIsFilled: PropTypes.bool.isRequired,
-  searchFieldRef: PropTypes.object.isRequired,
-  checkInput: PropTypes.func.isRequired,
-};
 
 export default SearchContainer;

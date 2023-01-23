@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import SortTabContents from "components/sortingTab";
 import getData from "services/get-data";
-import PropTypes from "prop-types";
 import { RiArrowRightSLine, RiArrowDownSLine } from "react-icons/ri";
+import { MoviesContext } from "context/movies-context";
 import {
   StyledButton,
   StyledLeftPalette,
@@ -14,21 +14,9 @@ import {
 /**
  * A container that represents the left palette that has all tools (sort, filter, ...).
  *
- * @param {func} changeFetchingDataState A function that change the state of fetching data when the (getData) function is being called.
- * @param {string} sortedBy A string that represents state of the sorting technique of the movies.
- * @param {func} changeSortingTechnique A function that changes the state of the sorting technique of the movies.
- * @param {func} updateMoviesList A function that changes the list of movies from the API.
- * @param {func} updateMoviesPage A function that changes the the current page from the API.
- *
  * @return {Element} A styled component (section).
  */
-function LeftPalette({
-  changeFetchingDataState,
-  sortedBy,
-  changeSortingTechnique,
-  updateMoviesList,
-  updateMoviesPage,
-}) {
+function LeftPalette() {
   const sortBoxRef = useRef(null);
   const [searchButtonActive, setSearchButtonActive] = useState(false);
   const [sortBoxSelection, setSortBoxSelection] = useState(
@@ -39,15 +27,22 @@ function LeftPalette({
   const [filtersIsOpened, setFiltersIsOpened] = useState(false);
   const [whereToWatchIsOpened, setWhereToWatchIsOpened] = useState(false);
 
+  const {
+    setPopularMoviesList,
+    setPopularMoviesPage,
+    sortedBy,
+    setIsFetchingData,
+  } = useContext(MoviesContext);
+
   /**
    * A function that changes the sorting technique and the list of the movies accordingly.
    */
   const changeSearchHandler = async () => {
-    changeFetchingDataState(true);
+    setIsFetchingData(true);
     const data = await getData(sortedBy, 1);
-    updateMoviesPage(1);
-    updateMoviesList(data);
-    changeFetchingDataState(false);
+    setPopularMoviesPage(1);
+    setPopularMoviesList(data);
+    setIsFetchingData(false);
   };
 
   /**
@@ -79,7 +74,6 @@ function LeftPalette({
               changeBoxSelection={changeBoxSelection}
               sortBoxRef={sortBoxRef}
               changeSearchBtnState={changeSearchBtnState}
-              changeSortingTechnique={changeSortingTechnique}
             />
           ),
           isOpened: sortIsOpened,
@@ -101,6 +95,7 @@ function LeftPalette({
         return (
           <StyledPaletteMainBox key={`main box number: ${index}`}>
             <StyledPaletteUpperBox
+              data-testid={`main box: ${slider.title}`}
               key={`upper box number: ${index}`}
               onClick={() => {
                 slider.setIsOpened((prev) => !prev);
@@ -115,7 +110,10 @@ function LeftPalette({
             </StyledPaletteUpperBox>
 
             {slider.isOpened && (
-              <StyledHiddenBox key={`hidden box number: ${index}`}>
+              <StyledHiddenBox
+                data-testid={`hidden box: ${slider.title}`}
+                key={`hidden box number: ${index}`}
+              >
                 {slider.tab}
               </StyledHiddenBox>
             )}
@@ -124,6 +122,7 @@ function LeftPalette({
       })}
 
       <StyledButton
+        data-testid="search button"
         searchButtonActive={searchButtonActive}
         onClick={changeSearchHandler}
         disabled={!searchButtonActive}
@@ -133,13 +132,5 @@ function LeftPalette({
     </StyledLeftPalette>
   );
 }
-
-LeftPalette.propTypes = {
-  changeFetchingDataState: PropTypes.func.isRequired,
-  sortedBy: PropTypes.string.isRequired,
-  changeSortingTechnique: PropTypes.func.isRequired,
-  updateMoviesList: PropTypes.func.isRequired,
-  updateMoviesPage: PropTypes.func.isRequired,
-};
 
 export default LeftPalette;

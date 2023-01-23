@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { IconContext } from "react-icons";
 import { ImPlus } from "react-icons/im";
 import { FaBell } from "react-icons/fa";
@@ -8,6 +8,7 @@ import { GoThreeBars } from "react-icons/go";
 import { BsXLg } from "react-icons/bs";
 import constants from "utils/constants";
 import colors from "styles/colors";
+import { SearchContext } from "context/search-context";
 import {
   StyledHeader,
   StyledLogoImg,
@@ -30,15 +31,12 @@ import {
 /**
  * The Header component that has the main routes.
  *
- * @param {bool} searchIsOpened ???
- * @param {func} changeSearchIconState ???
- * @param {object} searchFieldRef ???
- *
  * @return {Element} A styled component (header).
  */
-function Header({ searchIsOpened, changeSearchIconState, searchFieldRef }) {
+function Header() {
   const [headerTransform, setHeaderTransform] = useState("none");
   const [drawerTransform, setDrawerTransform] = useState("translateX(-100%)");
+  const { searchFieldRef, searchIsOpened, setSearchIsOpened } = useContext(SearchContext);
 
   const [moviesBtnIsHovered, setMoviesBtnIsHovered] = useState(false);
   const [tvShowsBtnIsHovered, setTVShowsBtnIsHovered] = useState(false);
@@ -63,11 +61,11 @@ function Header({ searchIsOpened, changeSearchIconState, searchFieldRef }) {
     var lastScroll = 0;
 
     window.addEventListener("scroll", () => {
-      const currentScroll = window.pageYOffset;
+      const currentScroll = window.scrollY;
 
-      if (currentScroll > lastScroll) {
+      if (currentScroll >= lastScroll) {
         setHeaderTransform("translate(0%, -100%)");
-        changeSearchIconState(false);
+        setSearchIsOpened(false);
       } else if (currentScroll < lastScroll) {
         setHeaderTransform("none");
       }
@@ -87,13 +85,21 @@ function Header({ searchIsOpened, changeSearchIconState, searchFieldRef }) {
         </StyledWrapper>
       </StyledHeaderButton>
 
-      <StyledDrawer transform={drawerTransform} mobile={true} desktop={false}>
+      <StyledDrawer
+        transform={drawerTransform}
+        mobile={true}
+        desktop={false}
+        data-testid="left drawer"
+      >
         {constants.drawerLists.map((list, index) => {
           return (
             <StyledDrawerList key={`drawer list number:${index}`}>
               {list.map((item, index) => {
                 return (
-                  <StyledDrawerTitle key={`drawer list item number:${index}`}>
+                  <StyledDrawerTitle
+                    key={`drawer list item number:${index}`}
+                    data-testid={`drawer-${item}`}
+                  >
                     {item}
                   </StyledDrawerTitle>
                 );
@@ -119,24 +125,22 @@ function Header({ searchIsOpened, changeSearchIconState, searchFieldRef }) {
                 mobile={false}
                 responsiveMargin={true}
               >
-                <StyledWrapper key={`wrapper number: ${index}`}>
+                <StyledWrapper
+                  key={`wrapper number: ${index}`}
+                  data-testid={list.title}
+                >
                   {list.title}
                   {hoveredStates[index] ? (
                     <StyledListContainer
                       key={`list container number: ${index}`}
                     >
-                      <StyledItemsList
-                        key={`item list number: ${index}`}
-                        onMouseEnter={() => {
-                          hoveredSetters[index](true);
-                        }}
-                        onMouseLeave={() => {
-                          hoveredSetters[index](false);
-                        }}
-                      >
+                      <StyledItemsList key={`item list number: ${index}`}>
                         {list.items.map((item) => {
                           return (
-                            <StyledItem key={`header list item: ${item}`}>
+                            <StyledItem
+                              data-testid={`${list.title}-${item}`}
+                              key={`header list item: ${item}`}
+                            >
                               {item}
                             </StyledItem>
                           );
@@ -159,6 +163,7 @@ function Header({ searchIsOpened, changeSearchIconState, searchFieldRef }) {
             <IconContext.Provider value={{ size: "100%", color: colors.white }}>
               <StyledWrapper>
                 <GoThreeBars
+                  data-testid="three bars button"
                   onClick={() => {
                     setDrawerTransform((prev) =>
                       prev === "none" ? "translateX(-100%)" : "none"
@@ -222,21 +227,17 @@ function Header({ searchIsOpened, changeSearchIconState, searchFieldRef }) {
               mobile: true,
               responsiveMargin: true,
               size: { mobile: 20, desktop: 23 },
+              testId: "search button",
               onClick: () => {
-                changeSearchIconState(!searchIsOpened);
+                setSearchIsOpened(!searchIsOpened);
+                setTimeout(() => {
+                  searchFieldRef.current.focus();
+                }, 100);
               },
               content: searchIsOpened ? (
                 <BsXLg color={colors.white} />
               ) : (
-                <TbSearch
-                  color="cyan"
-                  key="search"
-                  onClick={() =>
-                    setTimeout(() => {
-                      searchFieldRef.current.focus();
-                    }, 100)
-                  }
-                />
+                <TbSearch color="cyan" key="search" />
               ),
             },
           ].map((item, index) => {
@@ -247,6 +248,7 @@ function Header({ searchIsOpened, changeSearchIconState, searchFieldRef }) {
                 responsiveMargin={item.responsiveMargin}
                 key={`header button number: ${index}`}
                 onClick={item.onClick}
+                data-testid={item.testId}
               >
                 <StyledIcon
                   size={item.size}

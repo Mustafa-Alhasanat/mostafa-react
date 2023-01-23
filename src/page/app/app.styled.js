@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { mq } from "styles/media-query";
-import colors from "styles/colors";
 
 export const StyledMain = styled.main`
   width: 100%;
@@ -48,4 +47,5 @@ export const StyledUpperTitle = styled.div`
   margin-top: 4rem;
   font-size: 1.5rem;
 `;
+
 

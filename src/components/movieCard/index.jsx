@@ -26,6 +26,7 @@ import {
   StyledSubWindowItem,
   StyledSubWindowTitle,
   StyledBlurred,
+  StyledListModal,
 } from "components/movieCard/movie-card.styles";
 
 /**
@@ -71,21 +72,28 @@ function MovieCard({
     }
   }, [isListOpened]);
 
+  const clickSubListHandler = () => {
+    setIsClicked((prev) => !prev);
+    toggleIsOpened();
+  };
+
   return (
     <StyledCard key={movieKey}>
+      {clicked && isListOpened && (
+        <StyledListModal onClick={clickSubListHandler}></StyledListModal>
+      )}
+
       <StyledBlurred state={clicked && isListOpened} />
 
       <StyledCornerDots
-        onClick={() => {
-          setIsClicked((prev) => !prev);
-          toggleIsOpened();
-        }}
+        data-testid="horizontal three dots"
+        onClick={clickSubListHandler}
       >
         <HiDotsCircleHorizontal size={30} />
       </StyledCornerDots>
 
       {clicked && isListOpened && (
-        <StyledSubWindow>
+        <StyledSubWindow data-testid="hidden items list">
           {[
             {
               icon: <FaList size={13} />,
@@ -158,7 +166,7 @@ MovieCard.propTypes = {
   vote: PropTypes.number.isRequired,
   date: PropTypes.string.isRequired,
   overview: PropTypes.string.isRequired,
-  imageURL: PropTypes.string.isRequired,
+  imageURL: PropTypes.string,
   movieKey: PropTypes.string.isRequired,
   isListOpened: PropTypes.bool.isRequired,
   toggleIsOpened: PropTypes.func.isRequired,

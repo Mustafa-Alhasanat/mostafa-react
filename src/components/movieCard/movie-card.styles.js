@@ -164,7 +164,7 @@ export const StyledSubWindow = styled.ul`
     position: absolute;
     top: 2.5rem;
     right: -4rem;
-    z-index: 7;
+    z-index: 12;
     border: 0.0625rem solid ${colors.lightGray};
     border-radius: 0.3rem;
     overflow: hidden;
@@ -269,5 +269,20 @@ export const StyledOverview = styled.div`
 
   ${mq.desktop`
     display: none;
+  `}
+`;
+
+export const StyledListModal = styled.div`
+  display: none;
+
+  ${mq.desktop`
+    display: flex;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    z-index: 10;
+    top: 0;
+    left: 0;
   `}
 `;

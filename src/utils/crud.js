@@ -1,10 +1,6 @@
 import axios from "axios";
 
 class CRUD {
-  constructor(url) {
-    this.url = url;
-  }
-
   /**
    * A function that fetches the movies data from the API of TMDB.
    *

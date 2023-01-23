@@ -139,7 +139,7 @@ export const StyledDrawerList = styled.ul`
   align-items: flex-start;
 `;
 
-export const StyledDrawerTitle = styled.ul`
+export const StyledDrawerTitle = styled.li`
   width: 100%;
   padding: 0rem;
   margin-bottom: 0.9375rem;
@@ -152,7 +152,7 @@ export const StyledDrawerTitle = styled.ul`
   opacity: 0.9;
 `;
 
-export const StyledDrawerItem = styled.ul`
+export const StyledDrawerItem = styled.li`
   width: 100%;
   padding: 0rem;
   margin-bottom: 0.9375rem;
